@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Page Title</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'askme/style.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="container border test">
+    <div class="container center-nish">
+        <div class="container text-center">
+            <h1><b>Travel Buddy</b></h1>
+          </div>
+          
+          <div class="container text-center">
+            <form action="" method="post">
+              {% csrf_token %}
+              <label for="place">Enter the place</label><br>
+              <input type="text" name="place" id="place"><br>
+              <label for="duration">Enter the duration</label><br>
+              <input type="number" name="duration" id="duration"><br><br>
+              <!-- <input type="submit" value="Submit"><br><br> -->
+              <button type="submit" class="btn fifth" id="submit-button">Button 5</button>
+          </form>
+        </div>
+    </div>
+    
+
+    <div class="container text-center footer-nish">
+        <h1><b>Travel Buddy</b></h1>
+      </div>
+    
+  </div>
+  <script>
+    const charField = document.getElementById('place');
+    const intField = document.getElementById('duration');
+    const submitButton = document.getElementById('submit-button');
+
+    charField.addEventListener('input', () => {
+    if (charField.checkValidity() && intField.checkValidity()) {
+        submitButton.disabled = false;
+    } else {
+        submitButton.disabled = true;
+    }
+    });
+
+    intField.addEventListener('input', () => {
+    if (charField.checkValidity() && intField.checkValidity()) {
+        submitButton.disabled = false;
+    } else {
+        submitButton.disabled = true;
+    }
+    });
+  </script>
+
+  
+</body>
+</html>

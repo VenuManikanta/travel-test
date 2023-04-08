@@ -1,0 +1,274 @@
+{% load socialaccount %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Travel Buddy</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'logo.ico' %}"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Space+Mono">
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <style>
+        .profile-pic {
+          border-radius: 50%;
+          width: 2rem;
+          height: 2rem;
+        }
+    
+        .dropdown {
+          position: fixed;
+          top: 4rem;
+          right: 1rem;
+          
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{% url 'askme:askme_mform' %}">Travel Buddy</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <!-- <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li> -->
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'askme:askme_foodform' %}">Food Recommendations</a>
+              </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link" href="#">Trip Advisor</a>
+              </li> -->
+    
+            </ul>
+          </div>
+        </div>
+    </nav>
+    
+    {% if user.is_authenticated %}
+
+        {% if user.socialaccount_set.all %}
+            {% for account in user.socialaccount_set.all %}
+                {% if account.provider == "google" %}
+                    {% if account.extra_data.picture %}
+                    <div class="dropdown">
+                        <img src="{{ account.extra_data.picture }}" alt="Profile Picture"  class="profile-pic dropdown-toggle" data-bs-toggle="dropdown">        
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'askme:itineraries' %}">My Itineraries</a></li>
+                            <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+    {% else %}
+        
+    {% endif %}
+
+
+
+
+    
+    
+    {% if data %}
+    <div class="container">
+        <div class="container text-center">
+            <h1><b>Travel Buddy</b></h1>
+        </div>
+        {% if heading %}
+            <div class="container text-center">
+                <h2><b>{{ heading }}</b></h2>
+            </div>
+        {% endif %}
+
+
+
+
+        <div class="container text-center">
+            <form id="location-form" method="POST" action="{% url 'askme:flights' %}">
+                {% csrf_token %}
+                <input type="hidden" name="latitude" id="latitude-input" value="">
+                <input type="hidden" name="longitude" id="longitude-input" value="">
+                <input type="hidden" name="destination" id="longitude-input" value="{{ place }}">
+            </form>
+
+            <form id="hotel-form" method="POST" action="{% url 'askme:hotel' %}">
+                {% csrf_token %}
+                <input type="hidden" name="destination" id="longitude-input" value="{{ place }}">
+            </form>
+
+            <p>Let's start your trip by booking <a id="location-link" href="#">Flights</a> and <a id="hotel-link" href="#">Hotels</a></p>
+        </div>
+
+        <script>
+            function getLocation() {
+              if (window.navigator.geolocation) {
+                // Geolocation available
+                window.navigator.geolocation.getCurrentPosition(
+                  function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    const latitudeInput = document.getElementById('latitude-input');
+                    const longitudeInput = document.getElementById('longitude-input');
+                    latitudeInput.value = latitude;
+                    longitudeInput.value = longitude;
+                    document.getElementById('location-form').submit();
+                  },
+                  console.log
+                );
+              }
+            }
+            function getHotel() {
+                document.getElementById('hotel-form').submit();
+            }
+          
+            document.getElementById('location-link').addEventListener('click', getLocation);
+            document.getElementById('hotel-link').addEventListener('click', getHotel);
+        </script>
+
+
+
+        
+
+        <div class="container text-justify">
+            <div class="row">
+                <div class="col">
+                    {% autoescape off %}
+                    {{ data|linebreaks }}
+                    {% endautoescape %}
+                </div>
+            </div>
+
+            {% if personalised %}
+                {% if heading2 %}
+                    <div class="container text-center" id="heading2">
+                        <h2><b>{{ heading2 }}</b></h2>
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col">
+                        {% autoescape off %}
+                        {{ personalised|linebreaks }}
+                        {% endautoescape %}
+                    </div>
+                </div>
+
+            {% endif %}
+
+            <br>
+            
+            <div class="container">
+                <span>Do share it with your family and friends
+                    <a onclick="copyToClipboard('{{page_link}}')" href="#" class="icon-class">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+                            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                        </svg>
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+                        <script>
+                            function copyToClipboard(text) {
+                             navigator.clipboard.writeText(text)
+                             .then(() => {
+                             Swal.fire({
+                             title: 'Link copied to clipboard',
+                             icon: 'success',
+                             timer: 1500
+                             });
+                             })
+                             .catch((error) => console.log(error));
+                            }
+                        </script>
+
+                    </a>
+                </span>
+            </div>
+            
+            <br>
+            <input type="submit"
+                onclick="window.location='{% url 'askme:askme_mform' %}' ; return false;"
+                value="Search Again" class="btn btn-dark">
+                <br>
+                <br>
+                {% if heading %}
+                    {% if extra_button %}
+                    {% if user.is_authenticated %}
+                        
+                        <br>
+                        <form action="{% url 'askme:askme_chat' %}#heading2" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{ place }}" name="again_place" id="again_place">
+                            <input type="hidden" value="{{ duration }}" name="again_duration" id="again_duration">
+                            <span>
+                                Didn't like it? How can I make it better?
+                                <div class="input-group mb-3">
+                                    <input type="text" name="personalize_prompt" class="form-control" placeholder="Ex: make my trip adventurous" aria-label="Ex: make my trip adventurous" aria-describedby="button-addon2">
+                                    <button class="btn btn-outline-secondary text-white btn-dark " type="submit" id="button-addon2" onclick="startWaiting()">Go</button>
+                                    <script>
+                                        function startWaiting() {
+                                            var text = "Building a Personalized Itinerary just for you. Please be patient while we revolutionalize the way you travel with our AI-powered platform";
+                                            typeWriter(text, 0, function() {
+                                            console.log("Text has been typed out!");
+                                            });
+                                        }
+                                    </script>
+                                </div>
+                            </span>
+                        </form>
+
+                    {% else %}
+                    
+                        <form action="{% url 'askme:askme_again' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{ place }}" name="again_place" id="again_place">
+                            <input type="hidden" value="{{ duration }}" name="again_duration" id="again_duration">
+                            <span>
+                                Didn't like it?
+                                <input type="submit" value="Get another itinerary" class="btn btn-dark" onclick="startTyping()">
+                            </span>
+                        </form>
+                        <br>
+                        <p>Sign-up with <a href="{% provider_login_url 'google' %}">Google</a> for Premium services like Personalization</p>
+
+                    {% endif %}
+
+                        <br>
+
+                        <div class="container">
+                            <span id="make-visible"></span>
+                        </div>
+                        
+                        <br>
+                        
+                        <form action="{% url 'askme:askme_food' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{ place }}" name="food_place" id="food_place">
+                            <p>
+                                <input type="submit" src value="Get Food Recommendations" class="btn btn-dark" onclick="startFoodTyping()">
+                            </p>
+                        </form>
+                    {% endif %}
+                {% endif %}
+                <br>
+
+        </div>
+        
+        
+                    
+            
+        {% else %}
+        {% endif %}
+    </div>
+
+
+    <script src="{% static 'js/jsfile.js' %}"></script>
+</body>
+</html>
+
