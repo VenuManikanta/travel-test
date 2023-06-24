@@ -95,8 +95,8 @@ DATABASES = {
         'NAME': 'askme',
         'USER': 'root',
         'PASSWORD': 'root1234',
-        # 'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
-        # 'PORT': '3306',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
     }
 }
 
